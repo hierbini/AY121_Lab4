@@ -2,12 +2,12 @@ import numpy as np
 import ugradio
 import tool_box as tb
 import time
-import leusch
+import ugradio.leusch
 from astropy.coordinates import SkyCoord,AltAz,EarthLocation
 from astropy import units as u
 from astropy.time import Time
 import ugradio.timing
-import leo
+import ugradio.leo as leo
 
 def seconds_from_hours(number_of_hours):
     return number_of_hours * 3600
