@@ -13,7 +13,7 @@ def seconds_from_hours(number_of_hours):
     return number_of_hours * 3600
 
 
-DT =   # timestep for tracking
+DT = 5 # timestep for tracking
 max_time = tb.time["Julian"]() + seconds_from_hours(1)  # when to stop pointing
 coords = EarthLocation(lat=leo.lat*u.deg, lon=leo.lon*u.deg, height=leo.alt*u.m)
 
