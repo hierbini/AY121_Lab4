@@ -3,19 +3,37 @@ import ugradio
 import tool_box as tb
 import time
 import leusch
+from astropy.coordinates import SkyCoord,AltAz,EarthLocation
+from astropy import units as u
+from astropy.time import Time
+import ugradio.timing
+import leo
 
 def seconds_from_hours(number_of_hours):
     return number_of_hours * 3600
 
-DT = 5  # timestep for tracking
+
+DT =   # timestep for tracking
 max_time = tb.time["Julian"]() + seconds_from_hours(1)  # when to stop pointing
+coords = EarthLocation(lat=leo.lat*u.deg, lon=leo.lon*u.deg, height=leo.alt*u.m)
+
 
 def difference(a, b):
     return np.abs(a - b)
 
 
-def get_altaz(ra, dec):
-    return ugradio.coord.get_altaz(ra, dec, lat=leo.lat, lon=leo.lon, alt=leo.alt)
+def print_altaz(alt, az):
+    print("Altitude: " + str(alt), "Azimuth: " + str(az))
+
+
+def get_altaz(l, b, julian_date=None):
+    if julian_date == None:
+        julian_date = ugradio.timing.julian_date()
+    position = SkyCoord(frame='galactic', l=l, b=b, unit=(u.degree,u.degree))
+    altaz=position.transform_to(AltAz(obstime=Time(julian_date,format='jd'),location=coords))
+    alt, az = altaz.alt.deg, altaz.az.deg
+    print_altaz(alt, az)
+    return alt, az
 
 
 def track_object(altitude, azimuth, position_calculator):

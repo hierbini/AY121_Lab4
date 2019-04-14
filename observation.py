@@ -11,12 +11,12 @@ import leuschner
 class Observation:
 
     def load_observation_from_file(filename, create_info_method):
-    try:
-        pyfits.open("Data/" + filename)
-    except FileNotFoundError:
-        answer = raw_input("Are you about to take data? (yes/no): ")
-        if answer == "yes":
-            return create_info_method(filename)
+        try:
+            return pyfits.open("Data/" + filename)
+        except FileNotFoundError:
+            answer = raw_input("Are you about to take data? (yes/no): ")
+            if answer == "yes":
+                return create_info_method(filename)
 
     def __init__(self, filename):
         self.data = load_observation_from_file(filename, take_observation)
