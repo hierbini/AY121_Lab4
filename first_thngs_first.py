@@ -13,4 +13,4 @@ def save_observation(filename, number_of_spectra, galactic_coordinates):
 l, b = 120, 0
 alt, az = tracking.get_altaz(l, b)
 take_observation(alt, az)
-save_observation("Test", 100, (l, b))
+save_observation("Test.fits", 100, (l, b))
