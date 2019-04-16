@@ -32,7 +32,7 @@ class Observation:
 
     def save_observation(self, number_of_spectra, galactic_coordinates):
         spectrometer = leuscher.Spectrometer('10.0.1.2')
-        spectrometer.read_spec("Data/" + filename, number_of_spectra, galactic_coordinates)
+        spectrometer.read_spec("Data/" + filename + ".fits", number_of_spectra, galactic_coordinates)
 
 
     def load_info(self):
@@ -48,9 +48,9 @@ class Observation:
 
     def get_spectra(self, spectra_number, polarization="first"):
         if polarization == "first":
-            pol = 'auto0real'
+            pol = 'auto0_real'
         elif polarization == "second":
-            pol = 'auto1real'
+            pol = 'auto1_real'
         return self.data[spectra_number][pol]
 
 

@@ -9,7 +9,7 @@ def take_observation(altitude, azimuth):
 
 def save_observation(filename, number_of_spectra, galactic_coordinates):
 	spectrometer = leuschner.Spectrometer('10.0.1.2')
-	spectrometer.read_spec(filename, number_of_spectra, galactic_coordinates)
+	spectrometer.read_spec(filename + ".fits", number_of_spectra, galactic_coordinates)
 
 
 def observation(filename):
