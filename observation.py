@@ -1,63 +1,43 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import tool_box as tb
-import plot
-import os
-import rotation as rot
 import tracking
 import leuschner
+import ugradio.leusch
+
+def take_observation(filename):
+    degree_spacing = 2
+    longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
+    b = 0
+
+    LT = ugradio.leusch.LeuschTelescope()
+    spectrometer = leuschner.Spectrometer('10.0.1.2')
+
+    for l in longitude_range:
+        alt, az = tracking.get_altaz(l, b)
+        LT.point(alt, az)
+        spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
 
 
-class Observation:
-
-    def load_observation_from_file(filename, create_info_method):
-        try:
-            return pyfits.open("Data/" + filename)
-        except FileNotFoundError:
-            answer = raw_input("Are you about to take data? (yes/no): ")
-            if answer == "yes":
-                return create_info_method(filename)
-
-    def __init__(self, filename):
-        self.data = load_observation_from_file(filename, take_observation)
-        self.load_info(filename)
+def get_spectra(observation, spectra_number, polarization="first"):
+    if polarization == "first":
+        pol = 'auto0_real'
+    elif polarization == "second":
+        pol = 'auto1_real'
+    spectra = observation[spectra_number].data[pol]
+    return spectra, freqs
 
 
-    def take_observation(self, galactic_coordinates):
-        equatorial_coordinates = rot.rotate(galactic_coordinates, rot.GAL_to_EQ_rotation)
-        ra, dec = equatorial_coordinates[0], equatorial_coordinates[1]
-        initial_alt, initial_az = tracking.get_altaz(ra, dec)
-        tracking.tracking_object(initial_alt, initial_az, tracking.get_altaz)
+def plot_spectra(observation, n_spectra, title="Insert Title"):
+    power, freqs = average_spectra(observation, n_spectra)
+    self.power_plot = plt.figure(figsize = [15, 6])
+    plot.plot_power(power, freqs, title=title)
 
 
-    def save_observation(self, number_of_spectra, galactic_coordinates):
-        spectrometer = leuscher.Spectrometer('10.0.1.2')
-        spectrometer.read_spec("Data/" + filename + ".fits", number_of_spectra, galactic_coordinates)
-
-
-    def load_info(self):
-        file = open("Data/" + self.filename + "_info", "w+")
-        if os.stat("Data/" + self.filename).st_size == 0:
-            file.write("Observed Source: " + raw_input("Source observed: "))
-            file.write("Date of Observation: " + raw_input("Date of Observation (mm-dd): "))
-            file.write("Sampling Frequency: " + raw_input("Sampling Frequency (MHz): "))
-            file.write("LO Frequency: " + raw_input("Local Oscillator (MHz): "))
-        print(file)
-        file.close()
-
-
-    def get_spectra(self, spectra_number, polarization="first"):
-        if polarization == "first":
-            pol = 'auto0_real'
-        elif polarization == "second":
-            pol = 'auto1_real'
-        return self.data[spectra_number][pol]
-
-
-    def get_header(self, spectra_number):
-        print(self.data[spectra_number].header)
-
-
-    def plot_spectra(self, title="Insert Title"):
-        self.power_plot = plt.figure(figsize = [15, 6])
-        plot.plot_power(self.power, self.freq, title=title)
+def average_spectra(observation, n_spectra):
+    average_spectra = []
+    for i in np.arange(1, n_spectra):
+        average_spectra.append(get_spectra(observation, i))
+    v_samp = observation[0].header["SAMPRATE"]
+    freqs = tb.shift(tb.freq(len(spectra), d = 1 / v_samp)) / 1e6
+    return np.mean(np.array(average_spectra), axis = 0), freqs
