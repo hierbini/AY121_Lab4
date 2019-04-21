@@ -31,7 +31,12 @@ def get_spectra(observation, spectra_number, polarization="first"):
 def plot_spectra(observation, n_spectra, title="Insert Title"):
     power, freqs = average_spectra(observation, n_spectra)
     self.power_plot = plt.figure(figsize = [15, 6])
-    plot.plot_power(power, freqs, title=title)
+    plt.title(title)
+    plt.xlabel("Frequency (MHz)")
+    plt.ylabel("Power ($V^{2}$)")
+    plt.plot_power(power, freqs)
+    plt.grid()
+    plt.show()
 
 
 def average_spectra(observation, n_spectra):
