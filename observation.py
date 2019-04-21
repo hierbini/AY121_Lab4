@@ -6,7 +6,7 @@ import leuschner
 import ugradio.leusch
 
 ALT_MIN, ALT_MAX = 15, 85
-AZ_MIN, AZ_MIN = 5, 350
+AZ_MIN, AZ_MAX = 5, 350
 
 def take_observation(filename):
     degree_spacing = 2
