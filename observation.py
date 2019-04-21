@@ -5,6 +5,9 @@ import tracking
 import leuschner
 import ugradio.leusch
 
+ALT_MIN, ALT_MAX = 15, 85
+AZ_MIN, AZ_MIN = 5, 350
+
 def take_observation(filename):
     degree_spacing = 2
     longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
@@ -15,8 +18,9 @@ def take_observation(filename):
 
     for l in longitude_range:
         alt, az = tracking.get_altaz(l, b)
-        LT.point(alt, az)
-        spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
+        if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
+            LT.point(alt, az)
+            spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
 
 
 def get_spectra(observation, spectra_number, polarization="first"):
