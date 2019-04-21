@@ -2,7 +2,7 @@ import tracking
 import leuschner
 import ugradio.leusch
 
-def take_observation(altitude, azimuth):
+def point(altitude, azimuth):
 	LT = ugradio.leusch.LeuschTelescope()
 	LT.point(altitude, azimuth)
 

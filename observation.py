@@ -25,7 +25,7 @@ def get_spectra(observation, spectra_number, polarization="first"):
     elif polarization == "second":
         pol = 'auto1_real'
     spectra = observation[spectra_number].data[pol]
-    return spectra, freqs
+    return spectra
 
 
 def plot_spectra(observation, n_spectra, title="Insert Title"):
