@@ -14,9 +14,11 @@ def take_observation(filename):
     b = 0
     number_of_spectra = 20
 
+    synth = ugradio.agilent.SynthDirect()
     LT = ugradio.leusch.LeuschTelescope()
     spectrometer = leuschner.Spectrometer('10.0.1.2')
     missing_longitudes = np.load("missinglongitudes.npy")
+    synth.set_frequency(635, "MHz")
 
     for l in longitude_range:
         if (l in missing_longitudes):
