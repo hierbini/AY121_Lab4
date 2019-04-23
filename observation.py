@@ -12,15 +12,18 @@ def take_observation(filename):
     degree_spacing = 2
     longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
     b = 0
+    number_of_spectra = 20
 
     LT = ugradio.leusch.LeuschTelescope()
     spectrometer = leuschner.Spectrometer('10.0.1.2')
+    missing_longitudes = np.load("missinglongitudes.npy")
 
     for l in longitude_range:
-        alt, az = tracking.get_altaz(l, b)
-        if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
-            LT.point(alt, az)
-            spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
+        if (l in missinglongitudes):
+            alt, az = tracking.get_altaz(l, b)
+            if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
+                LT.point(alt, az)
+                spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
 
 
 def get_spectra(observation, spectra_number, polarization="first"):
