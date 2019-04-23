@@ -19,7 +19,7 @@ def take_observation(filename):
     missing_longitudes = np.load("missinglongitudes.npy")
 
     for l in longitude_range:
-        if (l in missinglongitudes):
+        if (l in missing_longitudes):
             alt, az = tracking.get_altaz(l, b)
             if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
                 LT.point(alt, az)
