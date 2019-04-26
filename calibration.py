@@ -17,14 +17,14 @@ def get_spectra(observation, spectra_number, polarization="first"):
 	Returns:
 	spectra (numpy array)
 	"""
-    if polarization == "first":
-        pol = 'auto0_real'
-    elif polarization == "second":
-        pol = 'auto1_real'
-    return observation[spectra_number].data[pol]
+	if polarization == "first":
+		pol = 'auto0_real'
+	elif polarization == "second":
+		pol = 'auto1_real'
+	return observation[spectra_number].data[pol]
 
 
-def average_spectra(observation, n_spectra):
+def get_average_spectra(observation, n_spectra):
 	"""
 	Gets the average spectra of all spectra taken during an observation
 
@@ -35,13 +35,13 @@ def average_spectra(observation, n_spectra):
 	Returns:
 	average_spectra (numpy array)
 	"""
-    average_spectra = []
-    for i in np.arange(1, n_spectra):
-        average_spectra.append(get_spectra(observation, i))
-    return np.mean(np.array(average_spectra), axis = 0)
+	average_spectra = []
+	for i in np.arange(1, n_spectra):
+		average_spectra.append(get_spectra(observation, i))
+	return np.mean(np.array(average_spectra), axis = 0)
 
 
-def frequency(observation):
+def frequency(header, average_spectra):
 	"""
 	Gets the frequency axis of the spectra in an observation
 
@@ -51,8 +51,8 @@ def frequency(observation):
 	Returns:
 	frequency (numpy array): a frequency array
 	"""
-	vsamp = observation[0].header["SAMPRATE"]
-	return tb.shift(tb.freq(len(average_spectra), d = 1/vsamp)) / 1e6 + 1420.4 + 150
+	vsamp = header["SAMPRATE"]
+	return (tb.shift(tb.freq(len(average_spectra), d = 1/vsamp)) / 1e6) + 1270 + 150
 
 
 def baseline_fit(average_spectra, freq):
@@ -66,15 +66,15 @@ def baseline_fit(average_spectra, freq):
 	Returns:
 	baseline (numpy array): the baseline fit
 	"""
-    filtered_spectra = scipy.signal.medfilt(average_spectra, kernel_size=5) # take out outliers
-    max_index = np.argmax(filtered_spectra)
-    cushion = 180
-    mask = np.ones(len(filtered_spectra), dtype=bool)
-    for i in range(len(mask)):
-        if i < max_index + cushion and i > max_index - cushion:
-            mask[i] = False
-    baseline = scipy.interpolate.interp1d(freq[mask], filtered_spectra[mask], kind='linear')
-    return baseline(freq)
+	filtered_spectra = scipy.signal.medfilt(average_spectra, kernel_size=5) # take out outliers
+	max_index = np.argmax(filtered_spectra)
+	cushion = 180
+	mask = np.ones(len(filtered_spectra), dtype=bool)
+	for i in range(len(mask)):
+		if i < max_index + cushion and i > max_index - cushion:
+			mask[i] = False
+	baseline = scipy.interpolate.interp1d(freq[mask], filtered_spectra[mask], kind='linear')
+	return baseline(freq)
 
 
 def get_gain(noise_on, noise_off):
@@ -93,7 +93,7 @@ def get_gain(noise_on, noise_off):
 	noise_off_spectra = average_spectra(noise_off, len(noise_off))
 	T_noise = 30
 	T_sky = 2.73
-	gain =  (T_noise - T_sky) / np.sum(noise_on_spectra - noise_off_spectra) * np.sum(noise_off_spectra)
+	gain = (T_noise - T_sky) / np.sum(noise_on_spectra - noise_off_spectra) * np.sum(noise_off_spectra)
 	return gain
 
 noise_on = pyfits.open("Data/noise_on.fits")
@@ -101,7 +101,7 @@ noise_off = pyfits.open("Data/noise_off.fits")
 gain = get_gain(noise_on, noise_off)
 
 
-def doppler_correction(observation):
+def doppler_correction(header):
 	"""
 	Determines the correction needed to shift the doppler velocity to the LSR frame
 
@@ -111,17 +111,17 @@ def doppler_correction(observation):
 	Returns:
 	correction (float): a number that is subtracted from the doppler velocity
 	"""
-	obs_header = observation[0].header
-	ra, dec, jd = obs_header["RA"], obs_header["DEC"], obs_header["JD"]
-	return ugradio.doppler.get_projected_velocity(ra, dec, jd) / 1e3
+	ra, dec, jd = header["RA"], header["DEC"], header["JD"]
+	correction = ugradio.doppler.get_projected_velocity(ra, dec, jd) / 1e3
+	return correction
 
 
-def doppler_velocity(observation, freq):
+def doppler_velocity(header, freq):
 	nu = 1420.4
 	delta_nu = freq - nu
-	c = 3e5
-	doppler_velocity = (delta_nu / nu) * c
-	return doppler_velocity - doppler_correction(observation)
+	c = 2.99e5
+	doppler_velocity = delta_nu / nu * c
+	return doppler_velocity - doppler_correction(header) - 30
 
 
 def calibrate_spectra(observation, n_spectra):
@@ -136,9 +136,10 @@ def calibrate_spectra(observation, n_spectra):
 	Returns:
 	n_spectra (int): the number of spectra taken during the observation
 	"""
-	average_spectra = average_spectra(observation, n_spectra)
-	freq = frequency(observation)
-	temperature_brightness = (average_spectra - baseline_fit(average_spectra, freq)) * gain
-	doppler_velocity = doppler_velocity(observation, freq)
-	return temperature_brightness, doppler_velocity
+	header = observation[0].header
+	average_spectra = get_average_spectra(observation, n_spectra)
+	freq = frequency(header, average_spectra)
+	temperature_brightness = (average_spectra - baseline_fit(baseline_fit(average_spectra, freq), freq)) * gain
+	v_doppler = doppler_velocity(header, freq)
+	return temperature_brightness, v_doppler
 

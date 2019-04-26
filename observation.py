@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tool_box as tb
 import tracking
-import leuschner
+#import leuschner
 import ugradio.leusch
 from astropy.coordinates import SkyCoord,AltAz,EarthLocation
 from astropy import units as u
@@ -47,11 +47,16 @@ def take_observation(filename):
                 spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
     LT.stow()
 
+
+degree_spacing = 2
+longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
+
 def find_missing_longitudes():
     missing_longitudes = []
     for l in longitude_range:
         try:
-            file = pyfits.open("Data/first_try" + str(l) + ".fits")
+            pyfits.open("Data/first_try" + str(l) + ".fits")
         except:
             missing_longitudes.append(l)
     np.save("missing_longitudes", missing_longitudes)
+    return missing_longitudes
