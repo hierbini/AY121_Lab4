@@ -9,6 +9,7 @@ from astropy import units as u
 from astropy.time import Time
 import ugradio.timing
 import time
+import astropy.io.fits as pyfits
 
 ALT_MIN, ALT_MAX = 15, 85
 AZ_MIN, AZ_MAX = 5, 350
