@@ -8,6 +8,7 @@ from astropy.coordinates import SkyCoord,AltAz,EarthLocation
 from astropy import units as u
 from astropy.time import Time
 import ugradio.timing
+import time
 
 ALT_MIN, ALT_MAX = 15, 85
 AZ_MIN, AZ_MAX = 5, 350
@@ -26,7 +27,8 @@ def get_altaz(l, b, julian_date=None):
     return alt, az
 
 
-def take_observation(filename):
+def take_observation(filename, wait):
+    time.sleep(wait)
     degree_spacing = 2
     longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
     b = 0
