@@ -41,7 +41,7 @@ def get_average_spectra(observation, n_spectra):
 	return np.mean(np.array(average_spectra), axis = 0)
 
 
-def frequency(header, average_spectra):
+def get_frequency(header, average_spectra):
 	"""
 	Gets the frequency axis of the spectra in an observation
 
@@ -89,8 +89,8 @@ def get_gain(noise_on, noise_off):
 	Returns:
 	gain (float): a multiplying constant
 	"""
-	noise_on_spectra = average_spectra(noise_on, len(noise_on))
-	noise_off_spectra = average_spectra(noise_off, len(noise_off))
+	noise_on_spectra = get_average_spectra(noise_on, len(noise_on))
+	noise_off_spectra = get_average_spectra(noise_off, len(noise_off))
 	T_noise = 30
 	T_sky = 2.73
 	gain = (T_noise - T_sky) / np.sum(noise_on_spectra - noise_off_spectra) * np.sum(noise_off_spectra)
@@ -138,7 +138,7 @@ def calibrate_spectra(observation, n_spectra):
 	"""
 	header = observation[0].header
 	average_spectra = get_average_spectra(observation, n_spectra)
-	freq = frequency(header, average_spectra)
+	freq = get_frequency(header, average_spectra)
 	temperature_brightness = (average_spectra - baseline_fit(baseline_fit(average_spectra, freq), freq)) * gain
 	v_doppler = doppler_velocity(header, freq)
 	return temperature_brightness, v_doppler

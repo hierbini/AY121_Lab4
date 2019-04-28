@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import tool_box as tb
+import tool_box as tbk
 import tracking
 import leuschner
 import ugradio.leusch
@@ -44,7 +44,7 @@ def take_observation(filename, wait):
 
     for l in longitude_range:
         if (l in missing_longitudes):
-            alt, az = tracking.get_altaz(l, b)
+            alt, az = get_altaz(l, b)
             if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
                 LT.point(alt, az)
                 spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
