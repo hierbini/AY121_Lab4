@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import tool_box as tbk
-import tracking
+import tool_box as tb
 import leuschner
 import ugradio.leusch
 from astropy.coordinates import SkyCoord,AltAz,EarthLocation
