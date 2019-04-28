@@ -13,7 +13,7 @@ import astropy.io.fits as pyfits
 
 ALT_MIN, ALT_MAX = 15, 85
 AZ_MIN, AZ_MAX = 5, 350
-coords = (leo.lat, leo.lon)
+coords = EarthLocation(lat=leo.lat*u.deg, lon=leo.lon*u.deg, height=leo.alt*u.m) #leuschner 
 
 def print_altaz(alt, az):
     print("Altitude: " + str(alt), "Azimuth: " + str(az))
