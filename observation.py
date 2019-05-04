@@ -29,6 +29,20 @@ def get_altaz(l, b, julian_date=None):
     return alt, az
 
 
+degree_spacing = 2
+longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
+
+def find_missing_longitudes():
+    missing_longitudes = []
+    for l in longitude_range:
+        try:
+            pyfits.open("Data/final" + str(l) + ".fits")
+        except:
+            missing_longitudes.append(l)
+    np.save("missing_longitudes", missing_longitudes)
+    return missing_longitudes
+
+
 def take_observation(filename, wait):
     time.sleep(wait)
     degree_spacing = 2
@@ -56,17 +70,4 @@ def take_observation(filename, wait):
     noise.off()
     spectrometer.read_spec("Data/" + filename + str(l) + "_noise_off.fits", number_of_spectra, (l, b))
     LT.stow()
-
-
-degree_spacing = 2
-longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
-
-def find_missing_longitudes():
-    missing_longitudes = []
-    for l in longitude_range:
-        try:
-            pyfits.open("Data/first_try" + str(l) + ".fits")
-        except:
-            missing_longitudes.append(l)
-    np.save("missing_longitudes", missing_longitudes)
-    return missing_longitudes
+    find_missing_longitudes()
