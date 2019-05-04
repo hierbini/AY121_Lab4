@@ -110,7 +110,7 @@ def create_map(length):
     return grid
 
 
-def plot_map(grid, length)
+def plot_map(grid, length):
     fs = 14 #fontsize for plots
     fig = plt.figure(figsize=[15, 15])
     plt.imshow(grid)

@@ -121,7 +121,7 @@ def doppler_velocity(header, freq):
 	delta_nu = freq - nu
 	c = 2.99e5
 	doppler_velocity = delta_nu / nu * c
-	return doppler_velocity - doppler_correction(header) - 30
+	return doppler_velocity - doppler_correction(header) - 40
 
 
 def calibrate_spectra(observation, n_spectra):

@@ -48,7 +48,7 @@ def take_observation(filename, wait):
             alt, az = get_altaz(l, b)
             if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
                 LT.point(alt, az)
-                spectrometer.read_spec(filename + str(l) + ".fits", number_of_spectra, (l, b))
+                spectrometer.read_spec("Data/" + filename + str(l) + ".fits", number_of_spectra, (l, b))
     LT.stow()
 
 
