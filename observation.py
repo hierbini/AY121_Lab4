@@ -47,8 +47,14 @@ def take_observation(filename, wait):
         if (l in missing_longitudes):
             alt, az = get_altaz(l, b)
             if (ALT_MIN < alt < ALT_MAX) and (AZ_MIN < az < AZ_MAX): 
+                l = np.round(l, 2)
                 LT.point(alt, az)
                 spectrometer.read_spec("Data/" + filename + str(l) + ".fits", number_of_spectra, (l, b))
+    noise = ugradio.leusch.LeuschNoise()
+    noise.on()
+    spectrometer.read_spec("Data/" + filename + str(l) + "_noise_on.fits", number_of_spectra, (l, b))
+    noise.off()
+    spectrometer.read_spec("Data/" + filename + str(l) + "_noise_off.fits", number_of_spectra, (l, b))
     LT.stow()
 
 
