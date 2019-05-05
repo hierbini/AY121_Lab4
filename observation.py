@@ -46,7 +46,7 @@ def find_missing_longitudes():
 def take_observation(filename, wait):
     time.sleep(wait)
     degree_spacing = 2
-    longitude_range = np.linspace(-10, 250, (250 + 10) / degree_spacing)
+    longitude_range = np.round(np.linspace(-10, 250, (250 + 10) / degree_spacing),2)
     b = 0
     number_of_spectra = 20
 
@@ -55,7 +55,7 @@ def take_observation(filename, wait):
 
     LT = ugradio.leusch.LeuschTelescope()
     spectrometer = leuschner.Spectrometer('10.0.1.2')
-    missing_longitudes = np.load("missing_longitudes.npy")
+    missing_longitudes = np.load("missing_longitudes_final.npy")
 
     for l in longitude_range:
         if (l in missing_longitudes):
