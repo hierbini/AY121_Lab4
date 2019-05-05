@@ -39,7 +39,7 @@ def find_missing_longitudes():
             pyfits.open("Data/final" + str(l) + ".fits")
         except:
             missing_longitudes.append(l)
-    np.save("missing_longitudes", missing_longitudes)
+    np.save("missing_longitudes_final", missing_longitudes)
     return missing_longitudes
 
 
